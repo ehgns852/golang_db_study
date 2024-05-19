@@ -25,6 +25,8 @@ func NewConfig(path string) *Config {
 	} else if err = toml.NewDecoder(f).Decode(c); err != nil {
 		panic(err)
 	} else {
+		c.Mongo.Uri = os.Getenv("MONGO_URI")
+		c.Mongo.Db = os.Getenv("MONGO_DB")
 		return c
 	}
 }
