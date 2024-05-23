@@ -17,3 +17,11 @@ type History struct {
 	ContentList []string `json:"contentList" bson:"contentList"`
 	CreateAt    int64    `json:"createAt" bson:"createAt"`
 }
+
+type BucketRequest struct {
+	User string `form:"user" binding:"required"`
+}
+
+type BucketResponse struct {
+	Response User `json:"response" bson:"response"`
+}
