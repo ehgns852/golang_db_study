@@ -18,8 +18,21 @@ type History struct {
 	CreateAt    int64    `json:"createAt" bson:"createAt"`
 }
 
-type BucketRequest struct {
+type UserRequest struct {
 	User string `form:"user" binding:"required"`
+}
+
+type CreateContentRequest struct {
+	Content string `json:"content"`
+	Price   int64  `json:"price"`
+}
+
+type CreateUserRequest struct {
+	User string `json:"user" binding:"required"`
+}
+
+type BuyRequest struct {
+	User string `json:"user" binding:"required"`
 }
 
 type ContentRequest struct {

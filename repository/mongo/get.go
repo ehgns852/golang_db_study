@@ -54,3 +54,15 @@ func (m *Mongo) GetUserHistory(user string) (*types.History, error) {
 		return h, nil
 	}
 }
+
+func (m *Mongo) PostCreateUser(user string) error {
+	return nil
+}
+
+func (m *Mongo) PostCreateContent(name string, price int64) error {
+	return nil
+}
+
+func (m *Mongo) PostBuy(user string) error {
+	return nil
+}

@@ -28,10 +28,53 @@ func NewMongoRouter(router *Router, mService *mongo.MService) {
 	m.router.GET(baseUri+"/bucket", m.userBucket)                     // 장바구니에 대한 정보
 	m.router.GET(baseUri+"/content", m.content)                       // 상품 정보를 조회
 	m.router.GET(baseUri+"/user-bucket-history", m.userBucketHistory) // 유저의 구매 이력 정보
+
+	m.router.POST(baseUri+"/create-user", m.createUser)       //유저 데이터 생성
+	m.router.POST(baseUri+"/create-content", m.createContent) //content 데이터 생성
+	m.router.POST(baseUri+"/buy", m.buy)                      // history 데이터 생성
+}
+
+func (m *MongoRouter) createUser(c *gin.Context) {
+	var req CreateUserRequest
+
+	if err := c.ShouldBindQuery(&req); err != nil {
+		m.router.ResponseErr(c, ErrMsg(BindingFailed, err))
+		return
+	} else if err := m.mService.PostCreateUser(req.User); err != nil {
+		m.router.ResponseErr(c, ErrMsg(ServerErr, err))
+	} else {
+		m.router.ResponseOK(c, "Success")
+	}
+}
+
+func (m *MongoRouter) createContent(c *gin.Context) {
+	var req CreateContentRequest
+
+	if err := c.ShouldBindQuery(&req); err != nil {
+		m.router.ResponseErr(c, ErrMsg(BindingFailed, err))
+		return
+	} else if err := m.mService.PostCreateContent(req.Content, req.Price); err != nil {
+		m.router.ResponseErr(c, ErrMsg(ServerErr, err))
+	} else {
+		m.router.ResponseOK(c, "Success")
+	}
+}
+
+func (m *MongoRouter) buy(c *gin.Context) {
+	var req BuyRequest
+
+	if err := c.ShouldBindQuery(&req); err != nil {
+		m.router.ResponseErr(c, ErrMsg(BindingFailed, err))
+		return
+	} else if err := m.mService.PostUserBuy(req.User); err != nil {
+		m.router.ResponseErr(c, ErrMsg(ServerErr, err))
+	} else {
+		m.router.ResponseOK(c, "Success")
+	}
 }
 
 func (m *MongoRouter) userBucket(c *gin.Context) {
-	var req BucketRequest
+	var req UserRequest
 
 	if err := c.ShouldBindQuery(&req); err != nil {
 		m.router.ResponseErr(c, ErrMsg(BindingFailed, err))
@@ -68,7 +111,7 @@ func (m *MongoRouter) content(c *gin.Context) {
 }
 
 func (m *MongoRouter) userBucketHistory(c *gin.Context) {
-	var req BucketRequest
+	var req UserRequest
 
 	if err := c.ShouldBindQuery(&req); err != nil {
 		m.router.ResponseErr(c, ErrMsg(BindingFailed, err))
