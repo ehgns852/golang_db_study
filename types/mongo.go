@@ -22,6 +22,6 @@ type BucketRequest struct {
 	User string `form:"user" binding:"required"`
 }
 
-type BucketResponse struct {
-	Response User `json:"response" bson:"response"`
+type ContentRequest struct {
+	Content string `form:"content"`
 }

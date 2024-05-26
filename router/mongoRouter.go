@@ -1,6 +1,7 @@
 package router
 
 import (
+	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	pM "go.mongodb.org/mongo-driver/mongo"
@@ -24,9 +25,9 @@ func NewMongoRouter(router *Router, mService *mongo.MService) {
 
 	m.router.GET(baseUri+"/health", m.health)
 
-	m.router.GET(baseUri+"/bucket", nil)              // 장바구니에 대한 정보
-	m.router.GET(baseUri+"/content", nil)             // 상품 정보를 조회
-	m.router.GET(baseUri+"/user-bucket-history", nil) // 유저의 구매 이력 정보
+	m.router.GET(baseUri+"/bucket", m.userBucket)                     // 장바구니에 대한 정보
+	m.router.GET(baseUri+"/content", m.content)                       // 상품 정보를 조회
+	m.router.GET(baseUri+"/user-bucket-history", m.userBucketHistory) // 유저의 구매 이력 정보
 }
 
 func (m *MongoRouter) userBucket(c *gin.Context) {
@@ -36,7 +37,44 @@ func (m *MongoRouter) userBucket(c *gin.Context) {
 		m.router.ResponseErr(c, ErrMsg(BindingFailed, err))
 		return
 	} else if r, err := m.mService.GetUserBucket(req.User); err != nil {
-		if err == pM.ErrNoDocuments {
+		if errors.Is(err, pM.ErrNoDocuments) {
+			m.router.ResponseErr(c, ErrMsg(NoDocument, err))
+		} else {
+			m.router.ResponseErr(c, ErrMsg(ServerErr, err))
+		}
+		return
+	} else {
+		m.router.ResponseOK(c, r)
+	}
+}
+
+func (m *MongoRouter) content(c *gin.Context) {
+	var req ContentRequest
+
+	if err := c.ShouldBindQuery(&req); err != nil {
+		m.router.ResponseErr(c, ErrMsg(BindingFailed, err))
+		return
+	} else if r, err := m.mService.GetContent(req.Content); err != nil {
+		if errors.Is(err, pM.ErrNoDocuments) {
+			m.router.ResponseErr(c, ErrMsg(NoDocument, err))
+		} else {
+			m.router.ResponseErr(c, ErrMsg(ServerErr, err))
+		}
+		return
+	} else {
+		m.router.ResponseOK(c, r)
+	}
+
+}
+
+func (m *MongoRouter) userBucketHistory(c *gin.Context) {
+	var req BucketRequest
+
+	if err := c.ShouldBindQuery(&req); err != nil {
+		m.router.ResponseErr(c, ErrMsg(BindingFailed, err))
+		return
+	} else if r, err := m.mService.GetContent(req.User); err != nil {
+		if errors.Is(err, pM.ErrNoDocuments) {
 			m.router.ResponseErr(c, ErrMsg(NoDocument, err))
 		} else {
 			m.router.ResponseErr(c, ErrMsg(ServerErr, err))
