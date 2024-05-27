@@ -32,6 +32,19 @@ func NewMongoRouter(router *Router, mService *mongo.MService) {
 	m.router.POST(baseUri+"/create-user", m.createUser)       //유저 데이터 생성
 	m.router.POST(baseUri+"/create-content", m.createContent) //content 데이터 생성
 	m.router.POST(baseUri+"/buy", m.buy)                      // history 데이터 생성
+	m.router.POST(baseUri+"/bucket", m.bucket)                // 장바구니 데이터 생성
+}
+func (m *MongoRouter) bucket(c *gin.Context) {
+	var req BucketRequest
+
+	if err := c.ShouldBindQuery(&req); err != nil {
+		m.router.ResponseErr(c, ErrMsg(BindingFailed, err))
+		return
+	} else if err := m.mService.PostBucketRequest(req.User, req.Content); err != nil {
+		m.router.ResponseErr(c, ErrMsg(ServerErr, err))
+	} else {
+		m.router.ResponseOK(c, "Success")
+	}
 }
 
 func (m *MongoRouter) createUser(c *gin.Context) {

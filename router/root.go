@@ -2,6 +2,7 @@ package router
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"golang_db_study/config"
@@ -50,7 +51,7 @@ func requestTimeOutMiddleWare(timeout time.Duration) gin.HandlerFunc {
 			fmt.Println("요청 완료")
 		case <-ctx.Done():
 			// 타임아웃이 발생하면 여기로 옴
-			if ctx.Err() == context.DeadlineExceeded {
+			if errors.Is(ctx.Err(), context.DeadlineExceeded) {
 				c.AbortWithStatusJSON(http.StatusGatewayTimeout, gin.H{"error": "Request Time out"})
 				return
 			}

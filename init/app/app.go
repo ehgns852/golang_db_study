@@ -25,7 +25,7 @@ func NewApp(config *config.Config) *App {
 		panic(err)
 	}
 
-	if a.service, err = service.NewService(config); err != nil {
+	if a.service, err = service.NewService(config, a.repository); err != nil {
 		panic(err)
 	}
 

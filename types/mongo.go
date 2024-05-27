@@ -38,3 +38,8 @@ type BuyRequest struct {
 type ContentRequest struct {
 	Content string `form:"content"`
 }
+
+type BucketRequest struct {
+	User    string `json:"user" binding:"required"`
+	Content string `json:"content" binding:"required"`
+}
